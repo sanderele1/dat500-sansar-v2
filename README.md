@@ -83,7 +83,45 @@ For your convenience, we have gathered all of the input and output files in a pr
     * Outputs: `<human interaction/none>`
     
     
-    
+#### LSH Embedding format
+When computing the LSH of our bases, we use the following python function:
+```python
+# import datasketch as ds # <- We assume you have this somewhere in your file
+def create_hash(sequence):
+    mh2 = ds.MinHash(num_perm=128)
+    for i, c in enumerate(sequence):
+        mh2.update(i.to_bytes(8, byteorder='little') + c.encode('utf8'))
+    return mh2
+```
+
+We encode base position as a absolute embedding (from the perspective of the sample read)
+
+LSH works on jaccardian set distance, and as such does not take element position into account, unless we tell it to.
+Ie: `hello` == `olleh`, as they both contain the same letters (they're a set of the same thing)
+
+*Absolute embeddings*
+The function uses simple absolute embeddings, which means it just encodes the position of each base with the base.
+So: `ATCG...` becomes `[(0, 'A'), (1, 'T'), (2, 'C'), ...]`
+
+This is very quick to compute, and query. A single mutation will only cause a single change. (ie: if `(1, 'T')` changes to `(1, 'G')`, only a single element of the set is different).
+This method struggles with insertions or deletions in the sequence, as if we for example do a insertion of `(1, 'G')` into position 1:
+`[(0, 'A'), (1, 'T'), (2, 'C'), ...]` becomes `[(0, 'A'), (1, 'G'), (2, 'T'), (3, 'C'), ...]`. As you can see, ever element after `(1, 'A')` will be different.
+
+In practice this is not neccesarily a big problem, as the sliding window covers all windows. Given enough reads, some read is probable to have the insertion/deletion be at the end, affecting few bases, and having a jaccardian difference less than the threshold.
+LSH does not do read alignment, so if we get false positives that is absolutely ok. We just don't want to miss index hits for the matching reference. But we also do not want to get too many candidate results back (a candidate result is just another word for a match, we can get many matches, and so many candidates. We call it a candidate before we run GenASM to actually decide which candidates are matches or not)
+
+Absolute embeddings is what we decided to use (due to the performance benefits, measured informally). We did not do a benchmark comparison, and leave it as a future exercise.
+
+*Relative embeddings*
+Another method, is to encode position relative to other elements. We can do this by just using a small sliding window.
+So: `ATCG...` becomes `[('AT'), ('TC'), ('CG'), ...]`.
+We can vary the window size to affect how stringent we are about the position.
+This can handle insertions and deletions really well, as the insertion/deletion will only cause a mismatch of the area immediately round it.
+However, this is slower to compute, and to query (As in general, there will be more matches).
+We also have the problem that a single mutation will not cause multiple differences in the set.
+Imagine if `T` in `ATCG...` flips to A, we get: `[('AA'), ('AC'), ('CG'), ...]`
+Multiple elements of the set now differ.
+
 #### `sliding-window.ipynb` - Spark
 This job computes a sliding window over the reference genome (assembledASM694v2), where the width of the window is the width of the sample reads (SRR15404285.fasta).
 
@@ -110,11 +148,14 @@ As each node does not hold the entire genome in memory at once, we do this on tw
 
 > Note: This could be made much more efficient by simply calculating the few border windows on the second pass, and not all of them again. You could then do a simple append, instead of a complicated join (as positions should be unique).
 
-### `convert-spark-hadoop-window.ipynb` - Spark
+#### `convert-spark-hadoop-window.ipynb` - Spark
 A simple job which just converts from Spark's sequence format, to base 64 encoded pickled objects, which hadoop understands easily.
 
 We just pickle the whole object (key and value), base 64 encode it, and save each object as a line in a textfile using `RDD.saveAsTextFile()`.
 
+#### `hbase_insert.py` - Hadoop
+This job computes LSH hashes of all of the windows, produced by `sliding-window.ipynb`, and inserts them into a HBase database.
+HBase insertion happens in parallel, on hadoop. Please refer to the section [LSH Embedding format] for how LSH is calculated.
 
 
 ## Cluster setup
