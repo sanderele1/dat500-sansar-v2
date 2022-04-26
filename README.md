@@ -13,9 +13,10 @@
     # Similar API interface to findspark, hopefully it will avoid confusion.
     # Also note: when using the connector in datasketch for the first time for a table, it may take a while to execute. This is due to it creating tables inside hbase with the specified prefix (encoded with base 64). Have some patience :)
     ```
+    
     Demos:
-        * `thrift2.ipynb` - HBase thrift2 connector demo
-        * `ds_thrift2.ipynb` - Datasketch LSH HBase binding 
+    * `thrift2.ipynb` - HBase thrift2 connector demo
+    * `ds_thrift2.ipynb` - Datasketch LSH HBase binding 
         
 * `GenASM/` - Custom python binding for [GenASM](https://github.com/CMU-SAFARI/GenASM)
     Note: not all contents of `genasm_aligner.c` is own work. Most of it is from the GenASM project. We only buildt the python bindings.
