@@ -34,8 +34,11 @@
 
 Files are implicitly assumed to be uploaded to hdfs if there is no step producing them.
 We explicitly mention uploading `SRR15404285.fasta`, as you must run the sra-tools first. (Or just find a fasta file version)
+These are also the cleaned up brethren of the actual files used to run the job for our presentation. We have not re-run everything after cleanup, so in-case there are errors, you may take a look at the original files in the old git repo.
+> Warning: Use adequate protection, such as an industrial grade face shield or protective goggles, when opening the original git repository. We are not responsible for physical, nor emotional damage caused the chaos of files.
+[The old (raw) git repository](https://github.com/sanderele1/dat500-project).
 
-For your convenience, we have gathered all of the input and output files in a pre-assembled $\approx$ 3GB `.tar.gz` file available [here (azure blob storage)](https://distributed.blob.core.windows.net/public/DAT500_blobs.tar.gz?sv=2020-10-02&st=2022-04-26T16%3A14%3A29Z&se=2023-04-27T16%3A14%3A00Z&sr=b&sp=r&sig=nBsI%2Bhw%2BrIchhbMlcjtE1Rdvp6OjqumhsIe0otQk6j8%3D) (available untill 2023, or whenever the project is no longer relevant. whichever is shorter).
+For your convenience, we have gathered all of the input and output files in a pre-assembled approx. 3GB `.tar.gz` file available [here (azure blob storage)](https://distributed.blob.core.windows.net/public/DAT500_blobs.tar.gz?sv=2020-10-02&st=2022-04-26T16%3A14%3A29Z&se=2023-04-27T16%3A14%3A00Z&sr=b&sp=r&sig=nBsI%2Bhw%2BrIchhbMlcjtE1Rdvp6OjqumhsIe0otQk6j8%3D) (available untill 2023, or whenever the project is no longer relevant. whichever is shorter).
 
 ### Sources:
 * `assembledASM694v2` - NCBI: https://www.ncbi.nlm.nih.gov/assembly/GCF_000006945.2/
@@ -78,3 +81,15 @@ For your convenience, we have gathered all of the input and output files in a pr
     * Inputs: `hdfs:///files/salmonella/assembly_reconstructed`
     * Inputs: `hdfs:///files/salmonella/assembledASM694v2`
     * Outputs: `<human interaction/none>`
+    
+    
+## Cluster setup
+
+We had a cluster setup, consisting of:
+1. 1x namenode (1 vcpu, 2GB ram, 20GB disk)
+2. 4x datanode (4 vcpu, 8GB ram, 80GB disk)
+
+We would not go lower than this, especially not on the namenode. Whilst using hbase and spark, we were sitting around 95% of RAM.
+You may not want to have the namenode also be a master node in the HBase cluster.
+
+On the datanodes, we're stuck with a bit of a dilemma. If we run just hadoop/spark, it's fine. But with HBase, problems start appearing. If you do not configure a memory limit for HBase, nor hadoop/spark, you quickly run into issues running out of memory. If you configure HBase to use 50% of the ram, and hadoop/spark the other 50%, you're missing out on performance for all the jobs not requiring HBase to be running.  Limiting the memory available to HBase may also impact write/read performance, although other than running out of memory, we did not profile this comparatively. These are just things to keep in mind.
