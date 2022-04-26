@@ -35,6 +35,12 @@
 Files are implicitly assumed to be uploaded to hdfs if there is no step producing them.
 We explicitly mention uploading `SRR15404285.fasta`, as you must run the sra-tools first. (Or just find a fasta file version)
 
+For your convenience, we have gathered all of the input and output files in a pre-assembled $\approx$ 3GB `.tar.gz` file available [here (azure blob storage)](https://distributed.blob.core.windows.net/public/DAT500_blobs.tar.gz?sv=2020-10-02&st=2022-04-26T16%3A14%3A29Z&se=2023-04-27T16%3A14%3A00Z&sr=b&sp=r&sig=nBsI%2Bhw%2BrIchhbMlcjtE1Rdvp6OjqumhsIe0otQk6j8%3D) (available untill 2023, or whenever the project is no longer relevant. whichever is shorter).
+
+### Sources:
+* `assembledASM694v2` - NCBI: https://www.ncbi.nlm.nih.gov/assembly/GCF_000006945.2/
+* `SRR15404285.sra` - NCBI: https://www.ncbi.nlm.nih.gov/sra/SRR15404285
+
 ### Building the fuzzy index
 1. `sliding-window.ipynb` - Spark
     * Inputs: `hdfs:///files/salmonella/assembledASM694v2`
