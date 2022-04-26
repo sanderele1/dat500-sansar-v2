@@ -99,7 +99,8 @@ We encode base position as a absolute embedding (from the perspective of the sam
 LSH works on jaccardian set distance, and as such does not take element position into account, unless we tell it to.
 Ie: `hello` == `olleh`, as they both contain the same letters (they're a set of the same thing)
 
-*Absolute embeddings*
+***Absolute embeddings***
+
 The function uses simple absolute embeddings, which means it just encodes the position of each base with the base.
 So: `ATCG...` becomes `[(0, 'A'), (1, 'T'), (2, 'C'), ...]`
 
@@ -112,7 +113,8 @@ LSH does not do read alignment, so if we get false positives that is absolutely 
 
 Absolute embeddings is what we decided to use (due to the performance benefits, measured informally). We did not do a benchmark comparison, and leave it as a future exercise.
 
-*Relative embeddings*
+***Relative embeddings***
+
 Another method, is to encode position relative to other elements. We can do this by just using a small sliding window.
 So: `ATCG...` becomes `[('AT'), ('TC'), ('CG'), ...]`.
 We can vary the window size to affect how stringent we are about the position.
