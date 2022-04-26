@@ -47,7 +47,7 @@ We explicitly mention uploading `SRR15404285.fasta`, as you must run the sra-too
     * Outputs: `<multiple hbase tables>: 'hbase_salmonella_pos_prefix_8`
 
 ### Querying for candidates, pre-alignment, filtering and read alignment
-1. [SRA Toolkit](https://github.com/ncbi/sra-tools) - `fasterq-dump.3.0.0 --fasta `
+1. [SRA Toolkit](https://github.com/ncbi/sra-tools) - `fasterq-dump.3.0.0 --fasta SRR15404285.sra`
     * Inputs: (local fs) `SRR15404285.sra`
     * Outputs: (local fs) `SRR15404285.fasta`
 2. Hadoop FS - `hadoop fs -put "SRR15404285.fasta" "hdfs:///files/salmonella/SRR15404285.fasta"`
