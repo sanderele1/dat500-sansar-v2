@@ -83,13 +83,50 @@ For your convenience, we have gathered all of the input and output files in a pr
     * Outputs: `<human interaction/none>`
     
     
+    
+#### `sliding-window.ipynb` - Spark
+This job computes a sliding window over the reference genome (assembledASM694v2), where the width of the window is the width of the sample reads (SRR15404285.fasta).
+
+As each node does not hold the entire genome in memory at once, we do this on two stages, where we offset the second stage to compute sliding windows where the first one had memory borders.
+
+1. Take the text:
+    
+    `Really long string, too big to fit on a single server`
+
+2. Spark splits the text up into partitions:
+     `Really long string, too` and ` big to fit on a single server`
+
+3. We compute sliding windows for each partition individually:
+    \[`Rea`, `eal`, ..., `too`\] and \[` bi`, `big`, ..., `ver`\]
+    We're missing \[`oo `, `o b`\]
+    
+4. We repartition our data, and shuffle the data with a offset equal to the window size.
+    `Really long string, too b` and `ig to fit on a single server`
+
+5. We compute sliding windows again:
+    \[`Rea`, `eal`, ..., `oo `, `o b`\] and \[` bi`, `big`, ..., `ver`\]
+
+6. We union the results, and we have our window.
+
+> Note: This could be made much more efficient by simply calculating the few border windows on the second pass, and not all of them again. You could then do a simple append, instead of a complicated join (as positions should be unique).
+
+### `convert-spark-hadoop-window.ipynb` - Spark
+A simple job which just converts from Spark's sequence format, to base 64 encoded pickled objects, which hadoop understands easily.
+
+We just pickle the whole object (key and value), base 64 encode it, and save each object as a line in a textfile using `RDD.saveAsTextFile()`.
+
+
+
 ## Cluster setup
 
 We had a cluster setup, consisting of:
-1. 1x namenode (1 vcpu, 2GB ram, 20GB disk)
-2. 4x datanode (4 vcpu, 8GB ram, 80GB disk)
+1. 1x namenode (1 vcpu, 2GB ram, 20GB disk, each)
+2. 4x datanode (4 vcpu, 8GB ram, 80GB disk, each)
 
 We would not go lower than this, especially not on the namenode. Whilst using hbase and spark, we were sitting around 95% of RAM.
-You may not want to have the namenode also be a master node in the HBase cluster.
+This may be alleviated by not including the namenode as a HBase master. But if you want to run things as the hadoop history server to view past logs, and other extensions, look into atleast 4GB on the namenode.
+We felt limited by our 2GB, as we could not use VS Code for development (it ate around 600MB), and were stuck with lighter weight alternatives such as jupyter-lab, or vi. As such, we strongly reccomend increasing the namenodes memory to 4GB.
 
-On the datanodes, we're stuck with a bit of a dilemma. If we run just hadoop/spark, it's fine. But with HBase, problems start appearing. If you do not configure a memory limit for HBase, nor hadoop/spark, you quickly run into issues running out of memory. If you configure HBase to use 50% of the ram, and hadoop/spark the other 50%, you're missing out on performance for all the jobs not requiring HBase to be running.  Limiting the memory available to HBase may also impact write/read performance, although other than running out of memory, we did not profile this comparatively. These are just things to keep in mind.
+On the datanodes, we're stuck with a bit of a dilemma. If we run just hadoop/spark, it's fine. But with HBase, problems start appearing. If you do not configure a memory limit for HBase, nor hadoop/spark, you quickly run into issues running out of memory. If you configure HBase to use 50% of the ram, and hadoop/spark the other 50%, you're missing out on performance for all the jobs not requiring HBase to be running.  Limiting the memory available to HBase may also impact write/read performance, although other than running out of memory, we did not profile this comparatively. You could shut down your hbase cluster between jobs when not in use, and individually limit hadoop/spark memory usage when hbase is running, but you loose your HBase cache. Had memory been doubled, to 16GB, it probably would have been fine with both (assuming you configure a max memory limit, otherwise they may fight eachother), as the pressure from other services consuming memory would have lessened.
+That being said, 8GB was entierly doable, and we could use 8GB datanodes again.
+
