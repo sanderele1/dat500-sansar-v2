@@ -5,7 +5,8 @@
     With: `thrift --gen py hbase.thrift`
 
 * `hbase_connector.py` - HBase thrift2 connector & datasketch hbase bindings
-    Usage: ```python
+    Usage: 
+    ```python
     import datasketch as ds
     import hbase_connector as hb # IMPORTANT: Must import this library after datasketch
     # A refactor should probably be made to use a '.init()' function to inject the required functions into datasketch
