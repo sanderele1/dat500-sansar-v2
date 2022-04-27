@@ -144,7 +144,7 @@ Multiple elements of the set now differ.
 ### `sliding-window.ipynb` - Spark
 This job computes a sliding window over the reference genome (assembledASM694v2), where the width of the window is the width of the sample reads (SRR15404285.fasta).
 
-As each node does not hold the entire genome in memory at once, we do this on two stages, where we offset the second stage to compute sliding windows where the first one had memory borders.
+As each node does not hold the entire genome in memory at once, we do this in two stages, where we offset the second stage to compute sliding windows where the first one had memory borders.
 
 1. Take the text:
     
