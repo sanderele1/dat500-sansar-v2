@@ -167,10 +167,22 @@ As each node does not hold the entire genome in memory at once, we do this in tw
 
 > Note: This could be made much more efficient by simply calculating the few border windows on the second pass, and not all of them again. You could then do a simple append, instead of a complicated join (as positions should be unique).
 
+Example input: `['AGAGATTACGTCTGGTTGCAAGAGATCATGACAGGGGGAATTGGTTGAAAATAAATATATCGCCAGCAGCACATGAACAA']`
+
+Example outputs (2 outputs): 
+``
+[(3532223, 'GCCACGCTATCGACGGTACCTTTTAATACCCGGTTGCTGCCAAGCGGCGTGATTTCGGCACGATATCCCGGACGC'),
+ (3729573, 'AGCTCTTTGGTCTCTTTCGGGTTAAGGCCAGCCGCCGGTTCGTCGAGCATCAGAATTTCTGGCTGCGTCACCATG')]
+``
+
 ### `convert-spark-hadoop-window.ipynb` - Spark
 A simple job which just converts from Spark's sequence format, to base 64 encoded pickled objects, which hadoop understands easily.
 
 We just pickle the whole object (key and value), base 64 encode it, and save each object as a line in a textfile using `RDD.saveAsTextFile()`.
+
+Example input: `[(3006618, 'TCCTCGCGAATGGTCTGAACCTGGAGCGATGGTTCGCCCGCTTTTATCAGCACCTTTCCGGCGTGCCGGAAGTCG')]`
+
+Example output: `[b'gASVVgAAAAAAAABKmuAtAIxLVENDVENHQ0dBQVRHR1RDVEdBQUNDVEdHQUdDR0FUR0dUVENHQ0NDR0NUVFRUQVRDQUdDQUNDVFRUQ0NHR0NHVEdDQ0dHQUFHVENHlIaULg==']`
 
 ### `hbase_insert.py` - Hadoop
 
@@ -200,6 +212,9 @@ For why we use Spark for preprocessing, see section: [Spark v. Hadoop](#spark-v-
 
 A simple job, which does preprocessing on `hdfs:///files/salmonella/SRR15404285.fasta`, and produces `hdfs:///files/salmonella/SRR15404285.pickleb64.320`. It simply extracts every read as a string, along with the index of that read into the `SRR15404285.fasta` file, making each read unique (so we could tract matches to reads later, if needed). We call that index the "read index". The output is repartitioned (we had 320 partitions, hence `.320` in the filename. To see why 320, see section [`mrjob_ass_safe.py` - Hadoop](#mrjob_ass_safepy---hadoop)), pickled, base64 encoded, then saved as a text file (with each line being one read object).
 
+Example input: `[(0, 'TGCCGNCCTGAGCGAAAGCCTGCTGGAAGAAGTAGCTTCGCTGGTGGAATGGCCGGTGGTATTGACGGCGAAATT')]`
+
+Example output: `[b'gASVUwAAAAAAAABLAIxLVEdDQ0dOQ0NUR0FHQ0dBQUFHQ0NUR0NUR0dBQUdBQUdUQUdDVFRDR0NUR0dUR0dBQVRHR0NDR0dUR0dUQVRUR0FDR0dDR0FBQVRUlIaULg==']`
 
 ### `mrjob_ass_safe.py` - Hadoop
 The job that queries the HBase databse with the sample reads, and outputs whole read-aligned matches (ie: not individual bases, but whole sequences).
@@ -257,6 +272,21 @@ def reducer(self, key, values):
     yield key, [item for sublist in values for item in sublist]
 ```
 
+
+
+### `re-assemble-grouped-positions.ipynb` - Spark
+Takes the output of `write-assembled-nohbase.py` and makes it easier to consume.
+
+ It finds the majority base for every base position, and yeilds that base for that position, also including vote percentage for that base, votes for that base, and all votes (passing it along from `write-assembled-nohbase.py`, in case you want to do something with it).
+
+ Example input: `['"100000"\t["A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A"]']`
+
+ Example output: `[(100000, ('A', 1.0, 11, [('A', 11)]))]`
+
+
+
+## Results for `SRR15404285.sra` and `assembledASM694v2` (index)
+You can find the result analysis in: `assembly-inspection.ipynb`
 
 ## Cluster setup
 
