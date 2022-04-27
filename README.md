@@ -217,6 +217,12 @@ read_index is the unique read index described in section [`preprocess-reads.ipyn
 We had some issues running this job, where some containers would somehow end up in a tigh-loop inside mapper_init (or atleast before mapper was evaluated). We added logging to *stderr* inside mapper, and on these containers specifically, it was never called. This would only happen occasionally, and we got sufficient usable output that we were able to reconstruct most of the DNA (approx. 98%). We are still not sure why this happened, or what caused it. So please keep this in mind if you decide to run this job. We got around the issue by manually killing the containers using htop that were misbehaving. You can tell which containers they are, as they use all cpu resources avaiable to them, and they do not exit.
 
 
+
+### `write-assembled-nohbase.py` - Hadoop
+
+This is a post-processing job, that converts the whole sample reads from [`mrjob_ass_safe.py`](#mrjob_ass_safepy---hadoop)
+
+
 ## Cluster setup
 
 We had a cluster setup, consisting of:
