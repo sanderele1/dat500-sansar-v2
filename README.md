@@ -97,7 +97,7 @@ import logging
 # ...
 logging.disable(logging.CRITICAL)
 ```
-Remember, you may not be calling any logging, but a library you have imported may!
+*Remember, you may not be calling any logging, but a library you have imported may!*
 
 
 ### LSH Embedding format
@@ -198,7 +198,24 @@ For our column families, we added a bloom filter for our rows and columns (for f
 ### `preprocess-reads.ipynb` - Spark
 For why we use Spark for preprocessing, see section: [Spark v. Hadoop](#spark-v-hadoop)
 
-A simple job, which does preprocessing on `hdfs:///files/salmonella/SRR15404285.fasta`, and produces `hdfs:///files/salmonella/SRR15404285.pickleb64.320`. It simply extracts every read as a string, along with the index of that read into the `SRR15404285.fasta` file, making each read unique (so we could tract matches to reads later, if needed). The output is repartitioned (we had 320 partitions, hence `.320` in the filename), pickled, base64 encoded, then saved as a text file (with each line being one read object).
+A simple job, which does preprocessing on `hdfs:///files/salmonella/SRR15404285.fasta`, and produces `hdfs:///files/salmonella/SRR15404285.pickleb64.320`. It simply extracts every read as a string, along with the index of that read into the `SRR15404285.fasta` file, making each read unique (so we could tract matches to reads later, if needed). We call that index the "read index". The output is repartitioned (we had 320 partitions, hence `.320` in the filename. To see why 320, see section [`mrjob_ass_safe.py` - Hadoop](#mrjob_ass_safepy---hadoop)), pickled, base64 encoded, then saved as a text file (with each line being one read object).
+
+
+### `mrjob_ass_safe.py` - Hadoop
+The job that queries the HBase databse with the sample reads, and outputs whole read-aligned matches (ie: not individual bases, but whole sequences).
+
+It runs the following steps in the mapper (which runs for every sample read):
+
+1. Decode input (base64decode, unpickle)
+2. Query HBase for LSH candidates
+3. Compute GenASM edit distance for all candidates
+4. Find the smallest edit distance
+5. Yield read_index, read, [all candidates with an edit distance equal the smallest edit distance found in step 4.]
+
+read_index is the unique read index described in section [`preprocess-reads.ipynb` - Spark](#preprocess-readsipynb---spark)
+
+
+
 
 
 ## Cluster setup
