@@ -30,7 +30,7 @@
 * `gasm.cpython-38-x86_64-linux-gnu.so` - Pre-buildt binaries for the custom GenASM bindings.
     
 
-# Pipeline:
+# Pipeline
 
 Files are implicitly assumed to be uploaded to hdfs if there is no step producing them.
 We explicitly mention uploading `SRR15404285.fasta`, as you must run the sra-tools first. (Or just find a fasta file version)
@@ -39,8 +39,9 @@ These are also the cleaned up brethren of the actual files used to run the job f
 [The old (raw) git repository](https://github.com/sanderele1/dat500-project).
 
 For your convenience, we have gathered all of the input and output files in a pre-assembled approx. 3GB `.tar.gz` file available [here (azure blob storage)](https://distributed.blob.core.windows.net/public/DAT500_blobs.tar.gz?sv=2020-10-02&st=2022-04-26T16%3A14%3A29Z&se=2023-04-27T16%3A14%3A00Z&sr=b&sp=r&sig=nBsI%2Bhw%2BrIchhbMlcjtE1Rdvp6OjqumhsIe0otQk6j8%3D) (available untill 2023, or whenever the project is no longer relevant. whichever is shorter).
+There is also a UiS only backup link (onedrive) [here](https://liveuis-my.sharepoint.com/:u:/g/personal/264854_uis_no/EUgLKoiOrpJCsNOZ10sjKkkBW-xhTSgx5lJQ53gP5-eL8g?e=BPvVgn).
 
-## Sources:
+## Sources
 * `assembledASM694v2` - NCBI: https://www.ncbi.nlm.nih.gov/assembly/GCF_000006945.2/
 * `SRR15404285.sra` - NCBI: https://www.ncbi.nlm.nih.gov/sra/SRR15404285
 
@@ -307,6 +308,7 @@ Takes the output of `write-assembled-nohbase.py` and makes it easier to consume.
 ## Results for `SRR15404285.sra` and `assembledASM694v2` (index)
 You can find the result analysis in: `assembly-inspection.ipynb`.
 
+We intend for you to be able to play around with the results yourself, and performa analysis without having a gigantic spark cluster. You may download the pre-computed results from the file in section [Pipeline](#pipeline). It should be runnable on a local spark installation.
 
 
 ## Cluster setup
