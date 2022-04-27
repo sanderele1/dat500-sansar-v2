@@ -159,6 +159,22 @@ We just pickle the whole object (key and value), base 64 encode it, and save eac
 This job computes LSH hashes of all of the windows, produced by `sliding-window.ipynb`, and inserts them into a HBase database.
 HBase insertion happens in parallel, on hadoop. Please refer to the section [LSH Embedding format] for how LSH is calculated.
 
+We designed the hadoop table format to be idempotent when inserting, in case of errors causing partial insertion. We are able to restart the jobs that were not completed, and re-run them. If something get's inserted twice, it will simply overwrite the old value (essentially doing nothing).)
+
+Datasketch requires two types of storage, a dictionary of lists, and a dictionary of sets.
+We need the ability to insert values into a given key, and to look up the values of that key, for the dictionary of lists.
+This is implemented in HBase by giving the key as the row-key, and the values are encoded as row qualifiers. Row value is left empty. If the same key-value pair is inserted multiple times, it will just overwrite the last one without issue.
+Due to the idempotent design of insertion, we can skip the write-ahead log, as if a container fails, we can just re-run that container.
+
+The dictionary of sets was implemented ontop of the dictionary of lists.
+
+For both of these classes, see: `HBaseDictListStorage` and `HBaseDictSetStorage` in `hbase_connector.py`.
+> Note: We did not implement all of the functionality provided by datasketch, like deleting values. We implemented only what we needed to perform our required tasks of insertion, and querying. Although this could be fairly easily implemented.
+
+
+
+#### 
+
 
 ## Cluster setup
 
