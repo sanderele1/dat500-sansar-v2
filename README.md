@@ -1,4 +1,4 @@
-## Support files:
+# Support files:
 
 * `hbase_thrift/` - Generated HBase bindings for python.
     Generated from: https://github.com/apache/hbase/blob/master/hbase-thrift/src/main/resources/org/apache/hadoop/hbase/thrift2/hbase.thrift
@@ -30,7 +30,7 @@
 * `gasm.cpython-38-x86_64-linux-gnu.so` - Pre-buildt binaries for the custom GenASM bindings.
     
 
-## Pipeline:
+# Pipeline:
 
 Files are implicitly assumed to be uploaded to hdfs if there is no step producing them.
 We explicitly mention uploading `SRR15404285.fasta`, as you must run the sra-tools first. (Or just find a fasta file version)
@@ -40,11 +40,11 @@ These are also the cleaned up brethren of the actual files used to run the job f
 
 For your convenience, we have gathered all of the input and output files in a pre-assembled approx. 3GB `.tar.gz` file available [here (azure blob storage)](https://distributed.blob.core.windows.net/public/DAT500_blobs.tar.gz?sv=2020-10-02&st=2022-04-26T16%3A14%3A29Z&se=2023-04-27T16%3A14%3A00Z&sr=b&sp=r&sig=nBsI%2Bhw%2BrIchhbMlcjtE1Rdvp6OjqumhsIe0otQk6j8%3D) (available untill 2023, or whenever the project is no longer relevant. whichever is shorter).
 
-### Sources:
+## Sources:
 * `assembledASM694v2` - NCBI: https://www.ncbi.nlm.nih.gov/assembly/GCF_000006945.2/
 * `SRR15404285.sra` - NCBI: https://www.ncbi.nlm.nih.gov/sra/SRR15404285
 
-### Building the fuzzy index
+## Building the fuzzy index
 1. `sliding-window.ipynb` - Spark
     * Inputs: `hdfs:///files/salmonella/assembledASM694v2`
     * Outputs: `hdfs:///files/salmonella/window`
@@ -55,7 +55,7 @@ For your convenience, we have gathered all of the input and output files in a pr
     * Inputs: `hdfs:///files/salmonella/window.b64pickled`
     * Outputs: `<multiple hbase tables>: 'hbase_salmonella_pos_prefix_8`
 
-### Querying for candidates, pre-alignment, filtering and read alignment
+## Querying for candidates, pre-alignment, filtering and read alignment
 1. [SRA Toolkit](https://github.com/ncbi/sra-tools) - `fasterq-dump.3.0.0 --fasta SRR15404285.sra`
     * Inputs: (local fs) `SRR15404285.sra`
     * Outputs: (local fs) `SRR15404285.fasta`
@@ -82,8 +82,25 @@ For your convenience, we have gathered all of the input and output files in a pr
     * Inputs: `hdfs:///files/salmonella/assembledASM694v2`
     * Outputs: `<human interaction/none>`
     
-    
-#### LSH Embedding format
+### Spark v. Hadoop
+
+> Note: When we are discussing hadoop, what we really mean is MRJob on Hadoop. We did not use Hadoop without MRJob, so keep that in mind. **So when we say Hadoop, we mean MRJob on Hadoop.**
+
+After having worked with spark and hadoop, we decided to use spark where we could. It's much faster to prototype with, being designed with rapid iteration in mind, even supporting jupyter notebooks (which we love). Spark let us get the job done fast (both in time required to solve a problem, and execution time), being easy and quick to work with being the main benefit. We only used hadoop when we ran into memory issues when inserting, and reading from hbase. 
+
+Hadoop also proved much easier to do abusive things with, like building a micro mapping framework inside MRJob in python. We did that due to thrift2 using blocking IO, to get a higher read throughput. It worked, but was no longer neccesary when we ran the job on the datanodes, having 4x more containers running on each, with lower round-trip time to hbase (each node locally hosted a hbase region server). You can view the remnants of that monstrosity in the old git repo, in the files: [`mrjob_ass.py`](https://github.com/sanderele1/dat500-project/blob/master/python/v2/mrjob_ass.py), [`mrjob_assembler.py`](https://github.com/sanderele1/dat500-project/blob/master/python/v2/mrjob_assembler.py), and [`assembler_perf.py`](https://github.com/sanderele1/dat500-project/blob/master/python/v2/assembler_perf.py). 
+
+If you intend to use multiprocessing inside hadoop, ensure you check if anything you are running is using a logging library. Our thrift2 bindings were, and were attempting to log string to *stderr*, which caused exceptions due to *stderr* being opened in binary mode. You can get some really odd errors from this, as the error reporting mechanism causes the error.
+To disable logging (to see if it is the issue), you may run:
+```python
+import logging
+# ...
+logging.disable(logging.CRITICAL)
+```
+Remember, you may not be calling any logging, but a library you have imported may!
+
+
+### LSH Embedding format
 When computing the LSH of our bases, we use the following python function:
 ```python
 # import datasketch as ds # <- We assume you have this somewhere in your file
@@ -124,7 +141,7 @@ We also have the problem that a single mutation will not cause multiple differen
 Imagine if `T` in `ATCG...` flips to A, we get: `[('AA'), ('AC'), ('CG'), ...]`
 Multiple elements of the set now differ.
 
-#### `sliding-window.ipynb` - Spark
+### `sliding-window.ipynb` - Spark
 This job computes a sliding window over the reference genome (assembledASM694v2), where the width of the window is the width of the sample reads (SRR15404285.fasta).
 
 As each node does not hold the entire genome in memory at once, we do this on two stages, where we offset the second stage to compute sliding windows where the first one had memory borders.
@@ -150,20 +167,25 @@ As each node does not hold the entire genome in memory at once, we do this on tw
 
 > Note: This could be made much more efficient by simply calculating the few border windows on the second pass, and not all of them again. You could then do a simple append, instead of a complicated join (as positions should be unique).
 
-#### `convert-spark-hadoop-window.ipynb` - Spark
+### `convert-spark-hadoop-window.ipynb` - Spark
 A simple job which just converts from Spark's sequence format, to base 64 encoded pickled objects, which hadoop understands easily.
 
 We just pickle the whole object (key and value), base 64 encode it, and save each object as a line in a textfile using `RDD.saveAsTextFile()`.
 
-#### `hbase_insert.py` - Hadoop
+### `hbase_insert.py` - Hadoop
+
 This job computes LSH hashes of all of the windows, produced by `sliding-window.ipynb`, and inserts them into a HBase database.
 HBase insertion happens in parallel, on hadoop. Please refer to the section [LSH Embedding format] for how LSH is calculated.
 
 We designed the hadoop table format to be idempotent when inserting, in case of errors causing partial insertion. We are able to restart the jobs that were not completed, and re-run them. If something get's inserted twice, it will simply overwrite the old value (essentially doing nothing).)
 
+HBase doesn't have a schema per-se, you only need to decide upon "column-families" when creating a table. You can then re-use these column-families for as many columns in a row you want. Every row can have different columns, and are independent. It's with the column families you can decide things like bloom filters, version history, etc...
+So to insert a row, you need a row key, and a list of columns (which consists of a column family, a column qualifier, and a value).
+We use the fact that each row can be looked upon like a dictionary in our table design.
+
 Datasketch requires two types of storage, a dictionary of lists, and a dictionary of sets.
 We need the ability to insert values into a given key, and to look up the values of that key, for the dictionary of lists.
-This is implemented in HBase by giving the key as the row-key, and the values are encoded as row qualifiers. Row value is left empty. If the same key-value pair is inserted multiple times, it will just overwrite the last one without issue.
+This is implemented in HBase by giving the key as the row-key, and the values are encoded as column qualifiers. Column value is left empty. If the same key-value pair is inserted multiple times, it will just overwrite the last one without issue.
 Due to the idempotent design of insertion, we can skip the write-ahead log, as if a container fails, we can just re-run that container.
 
 The dictionary of sets was implemented ontop of the dictionary of lists.
@@ -171,9 +193,12 @@ The dictionary of sets was implemented ontop of the dictionary of lists.
 For both of these classes, see: `HBaseDictListStorage` and `HBaseDictSetStorage` in `hbase_connector.py`.
 > Note: We did not implement all of the functionality provided by datasketch, like deleting values. We implemented only what we needed to perform our required tasks of insertion, and querying. Although this could be fairly easily implemented.
 
+For our column families, we added a bloom filter for our rows and columns (for faster lookups). And in our infinite wisdom, we forgot to enable the filter when running the insert job for the report (oops). It should be enabled now for future executions.
 
+### `preprocess-reads.ipynb` - Spark
+For why we use Spark for preprocessing, see section: [Spark v. Hadoop](spark-v.-hadoop)
 
-#### 
+A simple job, which does preprocessing on `hdfs:///files/salmonella/SRR15404285.fasta`, and produces `hdfs:///files/salmonella/SRR15404285.pickleb64.320`. It simply extracts every read as a string, along with the index of that read into the `SRR15404285.fasta` file, making each read unique (so we could tract matches to reads later, if needed). The output is repartitioned (we had 320 partitions, hence `.320` in the filename), pickled, base64 encoded, then saved as a text file (with each line being one read object).
 
 
 ## Cluster setup
