@@ -54,9 +54,11 @@ class CanMrJobDoThis(MRJob):
                 yield f"{base_position}", [base]
                 
     def combiner(self, key, values):
+        # https://stackoverflow.com/questions/952914/how-to-make-a-flat-list-out-of-a-list-of-lists
         yield key, [item for sublist in values for item in sublist]
     
     def reducer(self, key, values):
+        # https://stackoverflow.com/questions/952914/how-to-make-a-flat-list-out-of-a-list-of-lists
         yield key, [item for sublist in values for item in sublist]
     
 if __name__ == '__main__':

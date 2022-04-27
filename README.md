@@ -220,7 +220,42 @@ We had some issues running this job, where some containers would somehow end up 
 
 ### `write-assembled-nohbase.py` - Hadoop
 
-This is a post-processing job, that converts the whole sample reads from [`mrjob_ass_safe.py`](#mrjob_ass_safepy---hadoop)
+This is a post-processing job, that converts the whole sample reads from [`mrjob_ass_safe.py`](#mrjob_ass_safepy---hadoop) into per-base reads.
+
+**Mapper**
+
+The mapper takes a list of full sample reads, with the respective index matches. It then yields once for every calculated base position in those reads. The base position is the key, and all computed candidate bases as the value.
+It calculates the pase position, by taking the index of the base in the sample read, and adding the index of the first base in the associated match, for all the matches.
+
+Pseudocode of the mapper (for the actual implementation, see `write-assembled-nohbase.py`):
+
+```python
+    # Pseudocode, see write-assembled-nohbase.py for implementation
+    def mapper(self, _, value):
+        read_value, raw_matches = value
+        for raw_match in raw_matches:
+            match_index, match_value, match_comparison = raw_match
+
+            for i, base in enumerate(read_value):
+                base_position = match_index + i
+                yield f"{base_position}", [base]
+```
+
+**Combiner & Reducer**
+
+The combiner and reducer both group the candidate bases into a single list, essentially combining the "votes" from the mapper. Once the reducer is finished running, we'll have all our base positions as our keys, and all matching 
+
+Actual code for the combiner and reducer:
+
+```python
+def combiner(self, key, values):
+    # https://stackoverflow.com/questions/952914/how-to-make-a-flat-list-out-of-a-list-of-lists
+    yield key, [item for sublist in values for item in sublist]
+
+def reducer(self, key, values):
+    # https://stackoverflow.com/questions/952914/how-to-make-a-flat-list-out-of-a-list-of-lists
+    yield key, [item for sublist in values for item in sublist]
+```
 
 
 ## Cluster setup
