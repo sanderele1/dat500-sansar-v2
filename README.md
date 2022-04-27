@@ -175,7 +175,7 @@ We just pickle the whole object (key and value), base 64 encode it, and save eac
 ### `hbase_insert.py` - Hadoop
 
 This job computes LSH hashes of all of the windows, produced by `sliding-window.ipynb`, and inserts them into a HBase database.
-HBase insertion happens in parallel, on hadoop. Please refer to the section [LSH Embedding format] for how LSH is calculated.
+HBase insertion happens in parallel, on hadoop. Please refer to the section [LSH Embedding format](#lsh-embedding-format) for how LSH is calculated.
 
 We designed the hadoop table format to be idempotent when inserting, in case of errors causing partial insertion. We are able to restart the jobs that were not completed, and re-run them. If something get's inserted twice, it will simply overwrite the old value (essentially doing nothing).)
 
@@ -196,7 +196,7 @@ For both of these classes, see: `HBaseDictListStorage` and `HBaseDictSetStorage`
 For our column families, we added a bloom filter for our rows and columns (for faster lookups). And in our infinite wisdom, we forgot to enable the filter when running the insert job for the report (oops). It should be enabled now for future executions.
 
 ### `preprocess-reads.ipynb` - Spark
-For why we use Spark for preprocessing, see section: [Spark v. Hadoop](spark-v.-hadoop)
+For why we use Spark for preprocessing, see section: [Spark v. Hadoop](#spark-v-hadoop)
 
 A simple job, which does preprocessing on `hdfs:///files/salmonella/SRR15404285.fasta`, and produces `hdfs:///files/salmonella/SRR15404285.pickleb64.320`. It simply extracts every read as a string, along with the index of that read into the `SRR15404285.fasta` file, making each read unique (so we could tract matches to reads later, if needed). The output is repartitioned (we had 320 partitions, hence `.320` in the filename), pickled, base64 encoded, then saved as a text file (with each line being one read object).
 
