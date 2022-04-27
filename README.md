@@ -100,6 +100,25 @@ logging.disable(logging.CRITICAL)
 *Remember, you may not be calling any logging, but a library you have imported may!*
 
 
+When you are using spark, it is also important to note that the smallest unit spark will process in parallel is a partition. If you have 1000 cores, and 1 partition, only 1 core will be used. If you have fewer partitions that you have cores, or using operations that reduce the number of partitions, consider re-partitioning with [`.repartition(num_paritions)`](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.RDD.repartition.html)
+If you have your cluster running on all your datanodes, but only see a few cores being utilized and you correctly configured `spark.executor.instances` in your config, then too few partitions may be the issue.
+
+You can easily configure the number of executors, and their memory limit individually in your python scripts or notebooks, for example like this:
+```python
+from pyspark.sql import SparkSession
+
+spark = (SparkSession
+         .builder
+         .master("yarn")
+         .appName("your-brilliant-spark-appname")
+         .config("spark.executor.instances", 16)
+         .config("spark.executor.memory", "1536m")
+         .getOrCreate())
+
+sc = spark.sparkContext
+# sc is if you want access to RDD's
+```
+
 ### LSH Embedding format
 When computing the LSH of our bases, we use the following python function:
 ```python
@@ -286,7 +305,9 @@ Takes the output of `write-assembled-nohbase.py` and makes it easier to consume.
 
 
 ## Results for `SRR15404285.sra` and `assembledASM694v2` (index)
-You can find the result analysis in: `assembly-inspection.ipynb`
+You can find the result analysis in: `assembly-inspection.ipynb`.
+
+
 
 ## Cluster setup
 
