@@ -88,7 +88,7 @@ class HBaseDictListStorage(ds.storage.OrderedStorage):
                     with self._pool as c:
                         # Create table here:
                         key_family = TColumnFamilyDescriptor(name=b'key', bloomnFilterType=TBloomFilterType.ROWCOL)
-                        value_family = TColumnFamilyDescriptor(name=b'value')
+                        value_family = TColumnFamilyDescriptor(name=b'value', bloomnFilterType=TBloomFilterType.ROWCOL)
                         name = TTableName(qualifier=self._table)
                         newTable = TTableDescriptor(tableName=name, columns=[key_family, value_family])
                         c.createTable(newTable, None)
