@@ -214,8 +214,7 @@ It runs the following steps in the mapper (which runs for every sample read):
 
 read_index is the unique read index described in section [`preprocess-reads.ipynb` - Spark](#preprocess-readsipynb---spark)
 
-
-
+We had some issues running this job, where some containers would somehow end up in a tigh-loop inside mapper_init (or atleast before mapper was evaluated). We added logging to *stderr* inside mapper, and on these containers specifically, it was never called. This would only happen occasionally, and we got sufficient usable output that we were able to reconstruct most of the DNA (approx. 98%). We are still not sure why this happened, or what caused it. So please keep this in mind if you decide to run this job. We got around the issue by manually killing the containers using htop that were misbehaving. You can tell which containers they are, as they use all cpu resources avaiable to them, and they do not exit.
 
 
 ## Cluster setup
@@ -223,6 +222,9 @@ read_index is the unique read index described in section [`preprocess-reads.ipyn
 We had a cluster setup, consisting of:
 1. 1x namenode (1 vcpu, 2GB ram, 20GB disk, each)
 2. 4x datanode (4 vcpu, 8GB ram, 80GB disk, each)
+
+We had no particular reason for choosing this cluster setup, other than being allocated 17 cores, and being recommended that 1vcpu and 2GB of ram was more than sufficient for a namenode.
+We also needed at least 3 nodes due to the project description. With the openstack vm skews available to us, it was the most obvious setup (not including 8x 2vcpu, or 16x 1vcpu, but os and application overhead would potentially become serious issues with these sizes).
 
 We would not go lower than this, especially not on the namenode. Whilst using hbase and spark, we were sitting around 95% of RAM.
 This may be alleviated by not including the namenode as a HBase master. But if you want to run things as the hadoop history server to view past logs, and other extensions, look into atleast 4GB on the namenode.
