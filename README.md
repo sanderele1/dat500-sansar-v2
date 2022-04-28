@@ -49,12 +49,21 @@ We had a cluster setup, consisting of:
 1. 1x namenode (1 vcpu, 2GB RAM, 20GB disk, each)
 2. 4x datanode (4 vcpu, 8GB RAM, 80GB disk, each)
 
+<<<<<<< HEAD
 We had no particular reason for choosing this cluster setup other than being allocated 17 cores, and being recommended that 1vcpu and 2GB of RAM was more than sufficient for a namenode.
 We also needed at least 3 nodes due to the project description. With the OpenStack VM skews available to us, it was the most obvious setup (not including 8x 2vcpu, or 16x 1vcpu, but OS and application overhead would potentially become serious issues with these sizes).
 
 We would not like to go lower than this, especially not on the namenode. Whilst using HBase and Spark, we were sitting around 95% of RAM.
 This may be alleviated by not including the namenode as a HBase master. But if you want to run things as the Hadoop history server to view past logs, and other extensions, look into atleast 4GB on the namenode.
 We felt limited by our 2GB, as we could not use VS Code for development (it ate around 600MB), and were stuck with lighter weight alternatives such as jupyter-lab, or vi. As such, we strongly recommend increasing the namenodes memory to 4GB.
+=======
+We had no particular reason for choosing this cluster setup, other than being allocated 17 cores, and being recommended that 1vcpu and 2GB of ram was more than sufficient for a namenode.
+We also needed at least 3 nodes due to the project description. With the openstack vm skews (xsmall, small, medium...) available to us, it was the most obvious setup (not including 8x 2vcpu, or 16x 1vcpu, but os and application overhead would potentially become serious issues with these sizes).
+
+We would not reccomend going lower than this, especially not on the namenode. Whilst using hbase and spark, we were sitting around 95% of RAM.
+This may be alleviated by not including the namenode as a HBase master. But if you want to run things as the hadoop history server to view past logs, and other extensions, look into atleast 4GB on the namenode.
+We felt limited by our 2GB, as we could not use VS Code for development (it ate around 600MB), and were stuck with lighter weight alternatives such as jupyter-lab, or vi. As such, we strongly reccomend increasing the namenodes memory to 4GB.
+>>>>>>> d648dc630f3dde0badeb6ab65b1ebb0925adef05
 
 On the datanodes we were stuck with a bit of a dilemma. If we run just Hadoop/Spark, it was fine. But with HBase problems started appearing. If you do not configure a memory limit for HBase, nor Hadoop/Spark, you quickly run into issues running out of memory. If you configure HBase to use 50% of the RAM, and Hadoop/Spark the other 50%, you're missing out on performance for all the jobs not requiring HBase to be running.  Limiting the memory available to HBase may also impact write/read performance, although other than running out of memory, we did not profile this comparatively. You could shut down your HBase cluster between jobs when not in use, and individually limit Hadoop/Spark memory usage when HBase is running, but you lose your HBase cache. Had memory been doubled (to 16GB) it probably would have been fine with both (assuming you configure a max memory limit, otherwise they may fight each other), as the pressure from other services consuming memory would have lessened.
 That being said, 8GB was entierly doable and we could use 8GB datanodes again.
@@ -115,15 +124,25 @@ There is also a UiS only backup link (onedrive) [here](https://liveuis-my.sharep
 * `SRR15404285.sra` - NCBI: https://www.ncbi.nlm.nih.gov/sra/SRR15404285
 
 ## Building the fuzzy index
-1. `sliding-window.ipynb` - Spark
+1. [`sliding-window.ipynb` - Spark](#sliding-windowipynb---spark)
     * Inputs: `hdfs:///files/salmonella/assembledASM694v2`
     * Outputs: `hdfs:///files/salmonella/window`
+<<<<<<< HEAD
 2. `convert-Spark-Hadoop-window.ipynb` - Spark
     * Inputs: `hdfs:///files/salmonella/window`
     * Outputs: `hdfs:///files/salmonella/window.b64pickled`
 3. `HBase_insert.py` - Hadoop
     * Inputs: `hdfs:///files/salmonella/window.b64pickled`
     * Outputs: `<multiple HBase tables>: 'HBase_salmonella_pos_prefix_8`
+=======
+2. [`convert-spark-hadoop-window.ipynb` - Spark](#convert-spark-hadoop-windowipynb---spark)
+    * Inputs: `hdfs:///files/salmonella/window`
+    * Outputs: `hdfs:///files/salmonella/window.b64pickled`
+3. [`hbase_insert.py` - Hadoop](#hbaseinsertpy---hadoop)
+    * Inputs: `hdfs:///files/salmonella/window.b64pickled`
+    * Outputs: `<multiple hbase tables>: 'hbase_salmonella_pos_prefix_8`
+    * Execute example: `python3 hbase_insert.py --table hbase_salmonella_pos_prefix_8 --hadoop-streaming-jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.1.jar -r hadoop hdfs:///files/salmonella/window.b64pickled --output-dir hdfs:///files/hbinsert --files hbase_connector.py`
+>>>>>>> d648dc630f3dde0badeb6ab65b1ebb0925adef05
 
 ## Querying for candidates, pre-alignment, filtering and read alignment
 1. [SRA Toolkit](https://github.com/ncbi/sra-tools) - `fasterq-dump.3.0.0 --fasta SRR15404285.sra`
@@ -132,22 +151,31 @@ There is also a UiS only backup link (onedrive) [here](https://liveuis-my.sharep
 2. Hadoop FS - `Hadoop fs -put "SRR15404285.fasta" "hdfs:///files/salmonella/SRR15404285.fasta"`
     * Inputs: (local fs) `SRR15404285.fasta`
     * Outputs: `hdfs:///files/salmonella/SRR15404285.fasta`
-1. `preprocess-reads.ipynb` - Spark
+1. [`preprocess-reads.ipynb` - Spark](#preprocess-readsipynb---spark)
     * Inputs: `hdfs:///files/salmonella/SRR15404285.fasta`
     * Outputs: `hdfs:///files/salmonella/SRR15404285.pickleb64.320`
+<<<<<<< HEAD
 2. `mrjob_ass_safe.py` - Hadoop
     * Inputs: `<multiple HBase tables>: 'HBase_salmonella_pos_prefix_8`
     * Inputs: `hdfs:///files/salmonella/SRR15404285.pickleb64.320`
     * Outputs: `hdfs:///files/salmonella/matches_v8`
 3. `write-assembled-noHBase.py` - Hadoop
+=======
+2. [`mrjob_ass_safe.py` - Hadoop](#mrjobasssafepy---hadoop)
+    * Inputs: `<multiple hbase tables>: 'hbase_salmonella_pos_prefix_8`
+    * Inputs: `hdfs:///files/salmonella/SRR15404285.pickleb64.320`
+    * Outputs: `hdfs:///files/salmonella/matches_v8`
+    * Execute example: `python3 mrjob_ass_safe.py --hadoop-streaming-jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.1.jar -r hadoop hdfs:///files/salmonella/SRR15404285.pickleb64.320 --files hbase_connector.py,gasm.cpython-38-x86_64-linux-gnu.so --output-dir hdfs:///files/salmonella/matches_v8 -Dmapreduce.task.timeout=3600000`
+3. [`write-assembled-nohbase.py` - Hadoop](#write-assembled-nohbasepy---hadoop)
+>>>>>>> d648dc630f3dde0badeb6ab65b1ebb0925adef05
     * Inputs: `hdfs:///files/salmonella/matches_v8`
     * Outputs: `hdfs:///files/salmonella/grouped_positions`
-4. `re-assemble-grouped-positions.ipynb` - Spark
+    * Execute example: `python3 write-assembled-nohbase.py --hadoop-streaming-jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.1.jar -r hadoop hdfs:///files/salmonella/matches_v8 --files hbase_connector.py,gasm.cpython-38-x86_64-linux-gnu.so --output-dir hdfs:///files/salmonella/grouped_positions`
+4. [`re-assemble-grouped-positions.ipynb` - Spark](#re-assemble-grouped-positionsipynb---spark)
     * Inputs: `hdfs:///files/salmonella/grouped_positions`
     * Outputs: `hdfs:///files/salmonella/assembly_reconstructed`
-
 ### Analysis
-1. `assembly-inspection.ipynb` - Spark
+1. [`assembly-inspection.ipynb` - Spark](#assembly-inspectionipynb---spark)
     * Inputs: `hdfs:///files/salmonella/assembly_reconstructed`
     * Inputs: `hdfs:///files/salmonella/assembledASM694v2`
     * Outputs: `<human interaction/none>`
@@ -349,7 +377,11 @@ Pseudocode of the mapper (for the actual implementation, see `write-assembled-no
 
 **Combiner & Reducer**
 
+<<<<<<< HEAD
 The combiner and reducer both group the candidate bases into a single list, essentially combining the "votes" from the mapper. Once the reducer is finished running we'll have all our base positions as our keys, and all matching.
+=======
+The combiner and reducer both group the candidate bases into a single list, essentially combining the "votes" from the mapper. Once the reducer is finished running, we'll have all our base positions as our keys, and all matching bases as values.
+>>>>>>> d648dc630f3dde0badeb6ab65b1ebb0925adef05
 
 Actual code for the combiner and reducer:
 
