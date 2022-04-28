@@ -351,7 +351,7 @@ Pseudocode of the mapper (for the actual implementation, see `write-assembled-no
 
 **Combiner & Reducer**
 
-The combiner and reducer both group the candidate bases into a single list, essentially combining the "votes" from the mapper. Once the reducer is finished running, we'll have all our base positions as our keys, and all matching 
+The combiner and reducer both group the candidate bases into a single list, essentially combining the "votes" from the mapper. Once the reducer is finished running, we'll have all our base positions as our keys, and all matching bases as values.
 
 Actual code for the combiner and reducer:
 
