@@ -26,7 +26,7 @@ See figure 1 in the GenASM paper:
     Use the GenASM aligner to perform edit distance calculations, aligning the sample read to the reference genome candidates.
 
 
-We do not have a seperate step for seeding and pre-alignment filtering, as we based our index on whole-read LSH. It's specifically buildt to only return similar candidates, within a specified jaccardian distance threshold. This is unlike the steps from the paper, which do not use LSH, but rather indexes on substrings (you could also do LSH on substrings). It should also be noted that we specifically targeted short reads, not long reads (which GenASM can handle).
+We do not have a seperate step for seeding and pre-alignment filtering, as we based our index on whole-read LSH. It's specifically buildt to only return similar candidates, within a specified jaccardian distance threshold. This is unlike the steps from the paper, which indexes on substrings (you could also do LSH on substrings). It should also be noted that we specifically targeted short reads, not long reads (which GenASM can handle).
 Short reads typically have no more than a few hundred base pairs, whilst long reads can have thousands to millions.[^1] Short reads generally also have a smaller error rate, whilst long reads have a higher error rate.[^1]
 
 
