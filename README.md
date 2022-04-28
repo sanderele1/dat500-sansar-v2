@@ -1,3 +1,39 @@
+# Usecase
+
+We decided for some unknown reason, to attempt to assemble DNA using hadoop and spark. The project for us was about figuring out how to do something with hadoop and spark, that traditionally either uses graph algorithms, or lots of random reads. The goal was to create a functional prototype that should scale horizontally with hardware, without any specific performance goals (nor code quality, as it's a prototype).
+
+As we really had no idea how to do DNA assembly, we perused various forms of literature. Our lack of backgrounds in the field of biology made understanding the literature challenging. We really made a breakthrough in understanding the field when we found the SAFARI seminar: [`SAFARI Live Seminar: Accelerating Genome Sequence Analysis via Efficient HW/Algorithm Co-Design`](https://www.youtube.com/watch?v=MfpLmrtvNtU) on youtube. This is where we found the GenASM paper, and our overarching architecture
+
+# Architecture
+
+Our architecture is inspired by the architecture presented in the paper (see section 2.1 Genome Sequence Analysis Pipeline, page 3): [`GenASM: A High-Performance, Low-Power Approximate String Matching Acceleration Framework for Genome Sequence Analysis`](https://doi.org/10.48550/arXiv.2009.07692).
+
+See figure 1 in the GenASM paper:
+![`SAFARI Live Seminar: Accelerating Genome Sequence Analysis via Efficient HW/Algorithm Co-Design` Figure 1](genasm_paper_figure_1_not_own_work.png "GenASM paper, figure 1")
+
+
+1. Indexing
+
+    Generates sliding windows over the reference genome, computes their LSH hashes, and inserts them into the HBase database.
+
+2. Seeding & 3. Pre-Alignment Filtering
+    Computes LSH of the sample reads, and queries the HBase database for candidates.
+    LSH does a good enough job of filtering, it essentially does the job of Pre-Alignmnet Filtering, so this is embedded in the database query.
+
+3. Read Alignment
+    Use the GenASM aligner to perform edit distance calculations, aligning the sample read to the reference genome candidates.
+
+
+We do not have a seperate step for seeding and pre-alignment filtering, as we based our index on whole-read LSH. It's specifically buildt to only return similar candidates, within a specified jaccardian distance threshold. This is unlike the steps from the paper, which do not use LSH, but rather indexes on substrings (you could also do LSH on substrings). It should also be noted that we specifically targeted short reads, not long reads (which GenASM can handle).
+Short reads typically have no more than a few hundred base pairs, whilst long reads can have thousands to millions.[^1] Short reads generally also have a smaller error rate, whilst long reads have a higher error rate.[^1]
+
+
+[^1]: [`GenASM paper, Introduction,  page 1 - https://doi.org/10.48550/arXiv.2009.07692`](https://doi.org/10.48550/arXiv.2009.07692)
+
+
+
+
+
 # Support files:
 
 * `hbase_thrift/` - Generated HBase bindings for python.
