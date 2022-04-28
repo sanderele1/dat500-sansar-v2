@@ -142,7 +142,7 @@ There is also a UiS only backup link (onedrive) [here](https://liveuis-my.sharep
     * Outputs: `hdfs:///files/salmonella/SRR15404285.pickleb64.320`
 
 4. [`mrjob_ass_safe.py` - Hadoop](#mrjob_ass_safepy---hadoop)
-    * Inputs: `<multiple HBase tables>: 'HBase_salmonella_pos_prefix_8`
+    * Inputs: `<multiple hbase tables>: 'hbase_salmonella_pos_prefix_8`
     * Inputs: `hdfs:///files/salmonella/SRR15404285.pickleb64.320`
     * Outputs: `hdfs:///files/salmonella/matches_v8`
     * Execute example: `python3 mrjob_ass_safe.py --hadoop-streaming-jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.1.jar -r hadoop hdfs:///files/salmonella/SRR15404285.pickleb64.320 --files hbase_connector.py,gasm.cpython-38-x86_64-linux-gnu.so --output-dir hdfs:///files/salmonella/matches_v8 -Dmapreduce.task.timeout=3600000`
