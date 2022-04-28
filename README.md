@@ -21,7 +21,7 @@ See figure 1 in the GenASM paper:
     Computes LSH of the sample reads, and queries the HBase database for candidates.
     LSH does a good enough job of filtering, it essentially does the job of Pre-Alignmnet Filtering, so this is embedded in the database query.
 
-3. Read Alignment
+4. Read Alignment
 
     Use the GenASM aligner to perform edit distance calculations, aligning the sample read to the reference genome candidates.
 
