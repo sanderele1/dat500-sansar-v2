@@ -35,7 +35,7 @@
 Files are implicitly assumed to be uploaded to hdfs if there is no step producing them.
 We explicitly mention uploading `SRR15404285.fasta`, as you must run the sra-tools first. (Or just find a fasta file version)
 These are also the cleaned up brethren of the actual files used to run the job for our presentation. We have not re-run everything after cleanup, so in-case there are errors, you may take a look at the original files in the old git repo.
-> Warning: Use adequate protection, such as an industrial grade face shield or protective goggles, when opening the original git repository. We are not responsible for physical, nor emotional damage caused the chaos of files.
+> Warning: Use adequate protection, such as an industrial grade face shield or protective goggles, when opening the original git repository. We are not responsible for physical, nor emotional damage caused by the chaos of files.
 [The old (raw) git repository](https://github.com/sanderele1/dat500-project).
 
 For your convenience, we have gathered all of the input and output files in a pre-assembled approx. 3GB `.tar.gz` file available [here (azure blob storage)](https://distributed.blob.core.windows.net/public/DAT500_blobs.tar.gz?sv=2020-10-02&st=2022-04-26T16%3A14%3A29Z&se=2023-04-27T16%3A14%3A00Z&sr=b&sp=r&sig=nBsI%2Bhw%2BrIchhbMlcjtE1Rdvp6OjqumhsIe0otQk6j8%3D) (available untill 2023, or whenever the project is no longer relevant. whichever is shorter).
