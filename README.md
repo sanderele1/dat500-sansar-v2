@@ -17,10 +17,12 @@ See figure 1 in the GenASM paper:
     Generates sliding windows over the reference genome, computes their LSH hashes, and inserts them into the HBase database.
 
 2. Seeding & 3. Pre-Alignment Filtering
+
     Computes LSH of the sample reads, and queries the HBase database for candidates.
     LSH does a good enough job of filtering, it essentially does the job of Pre-Alignmnet Filtering, so this is embedded in the database query.
 
 3. Read Alignment
+
     Use the GenASM aligner to perform edit distance calculations, aligning the sample read to the reference genome candidates.
 
 
