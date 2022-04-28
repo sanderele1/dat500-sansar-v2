@@ -43,6 +43,22 @@ Datasketch (the LSH library we chose) supports Redis (non-cluster mode, ie: sing
 Our professor reccomended HBase, and we thought it looked fun, so we decided to give it a try. It does everything we need (scales horizontally, can do random reads with keys, and insertions), and it even runs on HDFS.
 As datasketch does not support HBase out of the box, we made our own limited adapter. You can read about that in: [`hbase_insert.py` - Hadoop](#hbase_insertpy---hadoop), and check out `hbase_connector.py - HBase thrift2 connector & datasketch hbase bindings ` under [Support files](#support-files).
 
+## Cluster setup
+
+We had a cluster setup, consisting of:
+1. 1x namenode (1 vcpu, 2GB ram, 20GB disk, each)
+2. 4x datanode (4 vcpu, 8GB ram, 80GB disk, each)
+
+We had no particular reason for choosing this cluster setup, other than being allocated 17 cores, and being recommended that 1vcpu and 2GB of ram was more than sufficient for a namenode.
+We also needed at least 3 nodes due to the project description. With the openstack vm skews available to us, it was the most obvious setup (not including 8x 2vcpu, or 16x 1vcpu, but os and application overhead would potentially become serious issues with these sizes).
+
+We would not go lower than this, especially not on the namenode. Whilst using hbase and spark, we were sitting around 95% of RAM.
+This may be alleviated by not including the namenode as a HBase master. But if you want to run things as the hadoop history server to view past logs, and other extensions, look into atleast 4GB on the namenode.
+We felt limited by our 2GB, as we could not use VS Code for development (it ate around 600MB), and were stuck with lighter weight alternatives such as jupyter-lab, or vi. As such, we strongly reccomend increasing the namenodes memory to 4GB.
+
+On the datanodes, we're stuck with a bit of a dilemma. If we run just hadoop/spark, it's fine. But with HBase, problems start appearing. If you do not configure a memory limit for HBase, nor hadoop/spark, you quickly run into issues running out of memory. If you configure HBase to use 50% of the ram, and hadoop/spark the other 50%, you're missing out on performance for all the jobs not requiring HBase to be running.  Limiting the memory available to HBase may also impact write/read performance, although other than running out of memory, we did not profile this comparatively. You could shut down your hbase cluster between jobs when not in use, and individually limit hadoop/spark memory usage when hbase is running, but you loose your HBase cache. Had memory been doubled, to 16GB, it probably would have been fine with both (assuming you configure a max memory limit, otherwise they may fight each other), as the pressure from other services consuming memory would have lessened.
+That being said, 8GB was entierly doable, and we could use 8GB datanodes again.
+
 
 [^1]: [`GenASM paper, Introduction,  page 1 - https://doi.org/10.48550/arXiv.2009.07692`](https://doi.org/10.48550/arXiv.2009.07692)
 
@@ -80,7 +96,8 @@ As datasketch does not support HBase out of the box, we made our own limited ada
     ```
     
 * `gasm.cpython-38-x86_64-linux-gnu.so` - Pre-buildt binaries for the custom GenASM bindings.
-    
+
+
 
 # Pipeline
 
@@ -370,21 +387,4 @@ You can find the result analysis in: `assembly-inspection.ipynb`.
 We intend for you to be able to play around with the results yourself, and perform a analysis without having a gigantic spark cluster. You may download the pre-computed results from the file in section [Pipeline](#pipeline). It should be runnable on a local spark installation.
 
 Our goal in itself was not to prove something about the DNA, just assemble it. And we did! (about 98% of it, see problems in: [`mrjob_ass_safe.py` - Hadoop](#mrjobasssafepy---hadoop)) 
-
-
-## Cluster setup
-
-We had a cluster setup, consisting of:
-1. 1x namenode (1 vcpu, 2GB ram, 20GB disk, each)
-2. 4x datanode (4 vcpu, 8GB ram, 80GB disk, each)
-
-We had no particular reason for choosing this cluster setup, other than being allocated 17 cores, and being recommended that 1vcpu and 2GB of ram was more than sufficient for a namenode.
-We also needed at least 3 nodes due to the project description. With the openstack vm skews available to us, it was the most obvious setup (not including 8x 2vcpu, or 16x 1vcpu, but os and application overhead would potentially become serious issues with these sizes).
-
-We would not go lower than this, especially not on the namenode. Whilst using hbase and spark, we were sitting around 95% of RAM.
-This may be alleviated by not including the namenode as a HBase master. But if you want to run things as the hadoop history server to view past logs, and other extensions, look into atleast 4GB on the namenode.
-We felt limited by our 2GB, as we could not use VS Code for development (it ate around 600MB), and were stuck with lighter weight alternatives such as jupyter-lab, or vi. As such, we strongly reccomend increasing the namenodes memory to 4GB.
-
-On the datanodes, we're stuck with a bit of a dilemma. If we run just hadoop/spark, it's fine. But with HBase, problems start appearing. If you do not configure a memory limit for HBase, nor hadoop/spark, you quickly run into issues running out of memory. If you configure HBase to use 50% of the ram, and hadoop/spark the other 50%, you're missing out on performance for all the jobs not requiring HBase to be running.  Limiting the memory available to HBase may also impact write/read performance, although other than running out of memory, we did not profile this comparatively. You could shut down your hbase cluster between jobs when not in use, and individually limit hadoop/spark memory usage when hbase is running, but you loose your HBase cache. Had memory been doubled, to 16GB, it probably would have been fine with both (assuming you configure a max memory limit, otherwise they may fight each other), as the pressure from other services consuming memory would have lessened.
-That being said, 8GB was entierly doable, and we could use 8GB datanodes again.
 
