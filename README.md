@@ -2,7 +2,7 @@
 
 We decided for some unknown reason, to attempt to assemble DNA using hadoop and spark. The project for us was about figuring out how to do something with hadoop and spark, that traditionally either uses graph algorithms, or lots of random reads. The goal was to create a functional prototype that should scale horizontally with hardware, without any specific performance goals (nor code quality, as it's a prototype).
 
-As we really had no idea how to do DNA assembly, we perused various forms of literature. Our lack of backgrounds in the field of biology made understanding the literature challenging. We really made a breakthrough in understanding the field when we found the SAFARI seminar: [`SAFARI Live Seminar: Accelerating Genome Sequence Analysis via Efficient HW/Algorithm Co-Design`](https://www.youtube.com/watch?v=MfpLmrtvNtU) on youtube. This is where we found the GenASM paper, and our overarching architecture
+As we really had no idea how to do DNA assembly, we perused various forms of literature. Our lack of backgrounds in the field of biology made understanding the literature challenging. We really made a breakthrough in understanding the field when we found the SAFARI seminar: [`SAFARI Live Seminar: Accelerating Genome Sequence Analysis via Efficient HW/Algorithm Co-Design`](https://www.youtube.com/watch?v=MfpLmrtvNtU) on youtube. This is where we found the GenASM paper, and our overarching architecture.
 
 # Architecture
 
