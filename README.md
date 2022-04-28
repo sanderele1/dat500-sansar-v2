@@ -186,7 +186,7 @@ This method struggles with insertions or deletions in the sequence, as if we for
 In practice this is not neccesarily a big problem, as the sliding window covers all windows. Given enough reads, some read is probable to have the insertion/deletion be at the end, affecting few bases, and having a jaccardian difference less than the threshold.
 LSH does not do read alignment, so if we get false positives that is absolutely ok. We just don't want to miss index hits for the matching reference. But we also do not want to get too many candidate results back (a candidate result is just another word for a match, we can get many matches, and so many candidates. We call it a candidate before we run GenASM to actually decide which candidates are matches or not)
 
-Absolute embeddings is what we decided to use (due to the performance benefits, measured informally). We did not do a benchmark comparison, and leave it as a future exercise.
+Absolute embeddings is what we decided to use (due to the performance benefits, measured empirically). We did not do a benchmark comparison, and leave it as a future exercise.
 
 ***Relative embeddings***
 
