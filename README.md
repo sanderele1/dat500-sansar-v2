@@ -121,7 +121,7 @@ There is also a UiS only backup link (onedrive) [here](https://liveuis-my.sharep
 2. [`convert-spark-hadoop-window.ipynb` - Spark](#convert-spark-hadoop-windowipynb---spark)
     * Inputs: `hdfs:///files/salmonella/window`
     * Outputs: `hdfs:///files/salmonella/window.b64pickled`
-3. [`hbase_insert.py` - Hadoop](#hbaseinsertpy---hadoop)
+3. [`hbase_insert.py` - Hadoop](#hbase_insertpy---hadoop)
     * Inputs: `hdfs:///files/salmonella/window.b64pickled`
     * Outputs: `<multiple hbase tables>: 'hbase_salmonella_pos_prefix_8`
     * Execute example: `python3 hbase_insert.py --table hbase_salmonella_pos_prefix_8 --hadoop-streaming-jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.1.jar -r hadoop hdfs:///files/salmonella/window.b64pickled --output-dir hdfs:///files/hbinsert --files hbase_connector.py`
@@ -136,7 +136,7 @@ There is also a UiS only backup link (onedrive) [here](https://liveuis-my.sharep
 1. [`preprocess-reads.ipynb` - Spark](#preprocess-readsipynb---spark)
     * Inputs: `hdfs:///files/salmonella/SRR15404285.fasta`
     * Outputs: `hdfs:///files/salmonella/SRR15404285.pickleb64.320`
-2. [`mrjob_ass_safe.py` - Hadoop](#mrjobasssafepy---hadoop)
+2. [`mrjob_ass_safe.py` - Hadoop](#mrjob_ass_safepy---hadoop)
     * Inputs: `<multiple hbase tables>: 'hbase_salmonella_pos_prefix_8`
     * Inputs: `hdfs:///files/salmonella/SRR15404285.pickleb64.320`
     * Outputs: `hdfs:///files/salmonella/matches_v8`
