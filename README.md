@@ -362,7 +362,7 @@ Takes the output of `write-assembled-nohbase.py` and makes it easier to consume.
 ## Results for `SRR15404285.sra` and `assembledASM694v2` (index)
 You can find the result analysis in: `assembly-inspection.ipynb`.
 
-We intend for you to be able to play around with the results yourself, and performa analysis without having a gigantic spark cluster. You may download the pre-computed results from the file in section [Pipeline](#pipeline). It should be runnable on a local spark installation.
+We intend for you to be able to play around with the results yourself, and perform a analysis without having a gigantic spark cluster. You may download the pre-computed results from the file in section [Pipeline](#pipeline). It should be runnable on a local spark installation.
 
 
 ## Cluster setup
