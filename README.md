@@ -1,6 +1,6 @@
 # Usecase
 
-We decided for some unknown reason, to attempt to assemble DNA using hadoop and spark. The project for us was about figuring out how to do something with hadoop and spark, that traditionally either uses graph algorithms, or lots of random reads. The goal was to create a functional prototype that should scale horizontally with hardware, without any specific performance goals (nor code quality, as it's a prototype).
+We decided for some unknown reason, to attempt to assemble DNA using hadoop and spark. The project for us was about figuring out how to do something with hadoop and spark, that traditionally either uses graph algorithms, or lots of random reads. The goal was to have fun creating a functional prototype that should scale horizontally with hardware, without any specific performance goals (nor code quality, as it's a prototype). We did not end up doing any formal performance comparisons on horizontal scaling, and leave it as a future exercise. (But empirically, it was faster than on the namenode alone. And all technologies used should to some degree scale horizontally)
 
 As we really had no idea how to do DNA assembly, we perused various forms of literature. Our lack of backgrounds in the field of biology made understanding the literature challenging. We really made a breakthrough in understanding the field when we found the SAFARI seminar: [`SAFARI Live Seminar: Accelerating Genome Sequence Analysis via Efficient HW/Algorithm Co-Design`](https://www.youtube.com/watch?v=MfpLmrtvNtU) on youtube. This is where we found the GenASM paper, and our overarching architecture.
 
@@ -29,12 +29,12 @@ See figure 1 in the GenASM paper:
 We do not have a seperate step for seeding and pre-alignment filtering, as we based our index on whole-read LSH. It's specifically buildt to only return similar candidates, within a specified jaccardian distance threshold. This is unlike the steps from the paper, which indexes on substrings (you could also do LSH on substrings). It should also be noted that we specifically targeted short reads, not long reads (which GenASM can handle).
 Short reads typically have no more than a few hundred base pairs, whilst long reads can have thousands to millions.[^1] Short reads generally also have a smaller error rate, whilst long reads have a higher error rate.[^1]
 
+## Why LSH (locality-sensitive hashing)
+
+We immediately knew we probably needed some form of fuzzy index, to allow for mutations and errors in the DNA samples.  We already knew about the concept of LSH, and as it seemed fun, and fit our specific problem perfectly (fuzzy index), we decided to go for it.
+
 
 [^1]: [`GenASM paper, Introduction,  page 1 - https://doi.org/10.48550/arXiv.2009.07692`](https://doi.org/10.48550/arXiv.2009.07692)
-
-
-
-
 
 # Support files:
 
@@ -55,6 +55,10 @@ Short reads typically have no more than a few hundred base pairs, whilst long re
     Demos:
     * `thrift2.ipynb` - HBase thrift2 connector demo
     * `ds_thrift2.ipynb` - Datasketch LSH HBase binding 
+
+    > Note: Should you want to use HBase in your own python projects, ensure you check which version of thrift the libraries you want use use, uses (assuming it uses thrift). At the time of writing this document (2022-04-28), thrift2 is recommended. You may want to read the [HBase documentation about thrift1](https://web.archive.org/web/20220428115717/https://hbase.apache.org/1.1/apidocs/org/apache/hadoop/hbase/thrift/package-summary.html)[^2], and check out the "Important note" section before using it. This is why we went for using the raw thrift2 bindings (instead of happybase), and building our own small connector ontop of that.
+
+    [^2]: https://web.archive.org/web/20220428115717/https://hbase.apache.org/1.1/apidocs/org/apache/hadoop/hbase/thrift/package-summary.html
         
 * `GenASM/` - Custom python binding for [GenASM](https://github.com/CMU-SAFARI/GenASM)
     Note: not all contents of `genasm_aligner.c` is own work. Most of it is from the GenASM project. We only buildt the python bindings.
