@@ -124,6 +124,7 @@ There is also a UiS only backup link (onedrive) [here](https://liveuis-my.sharep
 3. `hbase_insert.py` - Hadoop
     * Inputs: `hdfs:///files/salmonella/window.b64pickled`
     * Outputs: `<multiple hbase tables>: 'hbase_salmonella_pos_prefix_8`
+    * Execute example: `python3 hbase_insert.py --table hbase_salmonella_pos_prefix_8 --hadoop-streaming-jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.1.jar -r hadoop hdfs:///files/salmonella/window.b64pickled --output-dir hdfs:///files/hbinsert --files hbase_connector.py`
 
 ## Querying for candidates, pre-alignment, filtering and read alignment
 1. [SRA Toolkit](https://github.com/ncbi/sra-tools) - `fasterq-dump.3.0.0 --fasta SRR15404285.sra`
@@ -139,13 +140,14 @@ There is also a UiS only backup link (onedrive) [here](https://liveuis-my.sharep
     * Inputs: `<multiple hbase tables>: 'hbase_salmonella_pos_prefix_8`
     * Inputs: `hdfs:///files/salmonella/SRR15404285.pickleb64.320`
     * Outputs: `hdfs:///files/salmonella/matches_v8`
+    * Execute example: `python3 mrjob_ass_safe.py --hadoop-streaming-jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.1.jar -r hadoop hdfs:///files/salmonella/SRR15404285.pickleb64.320 --files hbase_connector.py,gasm.cpython-38-x86_64-linux-gnu.so --output-dir hdfs:///files/salmonella/matches_v8 -Dmapreduce.task.timeout=3600000`
 3. `write-assembled-nohbase.py` - Hadoop
     * Inputs: `hdfs:///files/salmonella/matches_v8`
     * Outputs: `hdfs:///files/salmonella/grouped_positions`
+    * Execute example: `python3 write-assembled-nohbase.py --hadoop-streaming-jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.1.jar -r hadoop hdfs:///files/salmonella/matches_v8 --files hbase_connector.py,gasm.cpython-38-x86_64-linux-gnu.so --output-dir hdfs:///files/salmonella/grouped_positions`
 4. `re-assemble-grouped-positions.ipynb` - Spark
     * Inputs: `hdfs:///files/salmonella/grouped_positions`
     * Outputs: `hdfs:///files/salmonella/assembly_reconstructed`
-
 ### Analysis
 1. `assembly-inspection.ipynb` - Spark
     * Inputs: `hdfs:///files/salmonella/assembly_reconstructed`
