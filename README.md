@@ -181,7 +181,7 @@ So: `ATCG...` becomes `[(0, 'A'), (1, 'T'), (2, 'C'), ...]`
 
 This is very quick to compute, and query. A single mutation will only cause a single change. (ie: if `(1, 'T')` changes to `(1, 'G')`, only a single element of the set is different).
 This method struggles with insertions or deletions in the sequence, as if we for example do a insertion of `(1, 'G')` into position 1:
-`[(0, 'A'), (1, 'T'), (2, 'C'), ...]` becomes `[(0, 'A'), (1, 'G'), (2, 'T'), (3, 'C'), ...]`. As you can see, ever element after `(1, 'A')` will be different.
+`[(0, 'A'), (1, 'T'), (2, 'C'), ...]` becomes `[(0, 'A'), (1, 'G'), (2, 'T'), (3, 'C'), ...]`. As you can see, every element after `(1, 'A')` will be different.
 
 In practice this is not neccesarily a big problem, as the sliding window covers all windows. Given enough reads, some read is probable to have the insertion/deletion be at the end, affecting few bases, and having a jaccardian difference less than the threshold.
 LSH does not do read alignment, so if we get false positives that is absolutely ok. We just don't want to miss index hits for the matching reference. But we also do not want to get too many candidate results back (a candidate result is just another word for a match, we can get many matches, and so many candidates. We call it a candidate before we run GenASM to actually decide which candidates are matches or not)
