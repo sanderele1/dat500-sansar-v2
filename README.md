@@ -115,13 +115,13 @@ There is also a UiS only backup link (onedrive) [here](https://liveuis-my.sharep
 * `SRR15404285.sra` - NCBI: https://www.ncbi.nlm.nih.gov/sra/SRR15404285
 
 ## Building the fuzzy index
-1. `sliding-window.ipynb` - Spark
+1. [`sliding-window.ipynb` - Spark](#sliding-windowipynb---spark)
     * Inputs: `hdfs:///files/salmonella/assembledASM694v2`
     * Outputs: `hdfs:///files/salmonella/window`
-2. `convert-spark-hadoop-window.ipynb` - Spark
+2. [`convert-spark-hadoop-window.ipynb` - Spark](#convert-spark-hadoop-windowipynb---spark)
     * Inputs: `hdfs:///files/salmonella/window`
     * Outputs: `hdfs:///files/salmonella/window.b64pickled`
-3. `hbase_insert.py` - Hadoop
+3. [`hbase_insert.py` - Hadoop](#hbaseinsertpy---hadoop)
     * Inputs: `hdfs:///files/salmonella/window.b64pickled`
     * Outputs: `<multiple hbase tables>: 'hbase_salmonella_pos_prefix_8`
     * Execute example: `python3 hbase_insert.py --table hbase_salmonella_pos_prefix_8 --hadoop-streaming-jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.1.jar -r hadoop hdfs:///files/salmonella/window.b64pickled --output-dir hdfs:///files/hbinsert --files hbase_connector.py`
@@ -133,23 +133,23 @@ There is also a UiS only backup link (onedrive) [here](https://liveuis-my.sharep
 2. Hadoop FS - `hadoop fs -put "SRR15404285.fasta" "hdfs:///files/salmonella/SRR15404285.fasta"`
     * Inputs: (local fs) `SRR15404285.fasta`
     * Outputs: `hdfs:///files/salmonella/SRR15404285.fasta`
-1. `preprocess-reads.ipynb` - Spark
+1. [`preprocess-reads.ipynb` - Spark](#preprocess-readsipynb---spark)
     * Inputs: `hdfs:///files/salmonella/SRR15404285.fasta`
     * Outputs: `hdfs:///files/salmonella/SRR15404285.pickleb64.320`
-2. `mrjob_ass_safe.py` - Hadoop
+2. [`mrjob_ass_safe.py` - Hadoop](#mrjobasssafepy---hadoop)
     * Inputs: `<multiple hbase tables>: 'hbase_salmonella_pos_prefix_8`
     * Inputs: `hdfs:///files/salmonella/SRR15404285.pickleb64.320`
     * Outputs: `hdfs:///files/salmonella/matches_v8`
     * Execute example: `python3 mrjob_ass_safe.py --hadoop-streaming-jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.1.jar -r hadoop hdfs:///files/salmonella/SRR15404285.pickleb64.320 --files hbase_connector.py,gasm.cpython-38-x86_64-linux-gnu.so --output-dir hdfs:///files/salmonella/matches_v8 -Dmapreduce.task.timeout=3600000`
-3. `write-assembled-nohbase.py` - Hadoop
+3. [`write-assembled-nohbase.py` - Hadoop](#write-assembled-nohbasepy---hadoop)
     * Inputs: `hdfs:///files/salmonella/matches_v8`
     * Outputs: `hdfs:///files/salmonella/grouped_positions`
     * Execute example: `python3 write-assembled-nohbase.py --hadoop-streaming-jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.1.jar -r hadoop hdfs:///files/salmonella/matches_v8 --files hbase_connector.py,gasm.cpython-38-x86_64-linux-gnu.so --output-dir hdfs:///files/salmonella/grouped_positions`
-4. `re-assemble-grouped-positions.ipynb` - Spark
+4. [`re-assemble-grouped-positions.ipynb` - Spark](#re-assemble-grouped-positionsipynb---spark)
     * Inputs: `hdfs:///files/salmonella/grouped_positions`
     * Outputs: `hdfs:///files/salmonella/assembly_reconstructed`
 ### Analysis
-1. `assembly-inspection.ipynb` - Spark
+1. [`assembly-inspection.ipynb` - Spark](#assembly-inspectionipynb---spark)
     * Inputs: `hdfs:///files/salmonella/assembly_reconstructed`
     * Inputs: `hdfs:///files/salmonella/assembledASM694v2`
     * Outputs: `<human interaction/none>`
