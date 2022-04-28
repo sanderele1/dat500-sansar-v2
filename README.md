@@ -33,6 +33,16 @@ Short reads typically have no more than a few hundred base pairs, whilst long re
 
 We immediately knew we probably needed some form of fuzzy index, to allow for mutations and errors in the DNA samples.  We already knew about the concept of LSH, and as it seemed fun, and fit our specific problem perfectly (fuzzy index), we decided to go for it.
 
+## Why HBase (database)
+
+We needed a database which could provide fast random reads with a key, and fast writes and appends to a key. The database also needed to scale well horizontally. The database should be able to handle reasonable amounts of data, compared to the memory on each node. (As the sliding window indexing stores `length(reference_genome) * window_size` bases + metadata in the database). If we assume we could store the entire index in the memory of each node, ram-based databases such as Redis become much more viable.
+But we assumed that we could not (for better horisontal scaling).
+
+Datasketch (the LSH library we chose) supports Redis (non-cluster mode, ie: single node), Cassandra, and MongoDB (beta, with asyncio).
+
+Our professor reccomended HBase, and we thought it looked fun, so we decided to give it a try. It does everything we need (scales horizontally, can do random reads with keys, and insertions), and it even runs on HDFS.
+As datasketch does not support HBase out of the box, we made our own limited adapter. You can read about that in: [`hbase_insert.py` - Hadoop](#hbase_insertpy---hadoop), and check out `hbase_connector.py - HBase thrift2 connector & datasketch hbase bindings ` under [Support files](#support-files).
+
 
 [^1]: [`GenASM paper, Introduction,  page 1 - https://doi.org/10.48550/arXiv.2009.07692`](https://doi.org/10.48550/arXiv.2009.07692)
 
@@ -290,6 +300,8 @@ It runs the following steps in the mapper (which runs for every sample read):
 5. Yield read_index, read, [all candidates with an edit distance equal the smallest edit distance found in step 4.]
 
 read_index is the unique read index described in section [`preprocess-reads.ipynb` - Spark](#preprocess-readsipynb---spark)
+
+This is also where (in step 3.) you could use quality data associated with a read, to produce a more accurate distance metric. You could use a approximate string matching algorithm that supports custom distances, and you could penalize high quality mismatches (mistmatch between bases, where the read quality is high), and lower the cost of poor quality mismatches (if the quality is low, a mismatch is more probable). We did not do this in our prototype.
 
 We had some issues running this job, where some containers would somehow end up in a tigh-loop inside mapper_init (or atleast before mapper was evaluated). We added logging to *stderr* inside mapper, and on these containers specifically, it was never called. This would only happen occasionally, and we got sufficient usable output that we were able to reconstruct most of the DNA (approx. 98%). We are still not sure why this happened, or what caused it. So please keep this in mind if you decide to run this job. We got around the issue by manually killing the containers using htop that were misbehaving. You can tell which containers they are, as they use all cpu resources avaiable to them, and they do not exit.
 
