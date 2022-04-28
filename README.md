@@ -12,16 +12,16 @@ See figure 1 in the GenASM paper:
 ![`SAFARI Live Seminar: Accelerating Genome Sequence Analysis via Efficient HW/Algorithm Co-Design` Figure 1](genasm_paper_figure_1_not_own_work.png "GenASM paper, figure 1")
 
 
-1. Indexing
+1. Indexing (1.)
 
     Generates sliding windows over the reference genome, computes their LSH hashes, and inserts them into the HBase database.
 
-2. Seeding & 3. Pre-Alignment Filtering
+2. Seeding (2.) & Pre-Alignment Filtering (3.)
 
     Computes LSH of the sample reads, and queries the HBase database for candidates.
     LSH does a good enough job of filtering, it essentially does the job of Pre-Alignmnet Filtering, so this is embedded in the database query.
 
-4. Read Alignment
+3. Read Alignment (4.)
 
     Use the GenASM aligner to perform edit distance calculations, aligning the sample read to the reference genome candidates.
 
