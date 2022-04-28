@@ -52,7 +52,7 @@ We had a cluster setup, consisting of:
 We had no particular reason for choosing this cluster setup other than being allocated 17 cores, and being recommended that 1vcpu and 2GB of RAM was more than sufficient for a namenode.
 We also needed at least 3 nodes due to the project description. With the OpenStack VM skews (xsmall, small, medium...) available to us, it was the most obvious setup (not including 8x 2vcpu, or 16x 1vcpu, but OS and application overhead would potentially become serious issues with these sizes).
 
-We would not recommend to go lower than this setup, especially not on the namenode. Whilst using HBase and Spark, we were sitting around 95% of RAM.
+We would not recommend going lower than this setup, especially not on the namenode. Whilst using HBase and Spark, we were sitting around 95% of RAM.
 This may be alleviated by not including the namenode as a HBase master. But if you want to run things as the Hadoop history server to view past logs, and other extensions, look into atleast 4GB on the namenode.
 We felt limited by our 2GB, as we could not use VS Code for development (it ate around 600MB), and were stuck with lighter weight alternatives such as jupyter-lab, or vi. As such, we strongly recommend increasing the namenodes memory to 4GB.
 
