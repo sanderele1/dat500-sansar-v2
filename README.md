@@ -379,12 +379,14 @@ Takes the output of `write-assembled-nohbase.py` and makes it easier to consume.
 Simply a demo-file to show off some analysis on the assembled DNA.
 In the current configuration, it shows that most of the bases of the assembled DNA match the reference, and it also shows where mutations have taken place (bases actually changed in the sample DNA)
 
-You can play with this file yourself (we provide pre-buildt files), see [Results for `SRR15404285.sra` and `assembledASM694v2` (index)](#results-for-srr15404285sra-and-assembledasm694v2-index).
+You can play with this file yourself (we provide pre-buildt files), see [Pipeline](#pipeline).
 
-## Results for `SRR15404285.sra` and `assembledASM694v2` (index)
+## Results for `SRR15404285.sra` and `assembledASM694v2` (reference)
 You can find the result analysis in: `assembly-inspection.ipynb`.
 
 We intend for you to be able to play around with the results yourself, and perform a analysis without having a gigantic spark cluster. You may download the pre-computed results from the file in section [Pipeline](#pipeline). It should be runnable on a local spark installation.
 
-Our goal in itself was not to prove something about the DNA, just assemble it. And we did! (about 98% of it, see problems in: [`mrjob_ass_safe.py` - Hadoop](#mrjobasssafepy---hadoop)) 
+Our goal in itself was not to prove something about the DNA, just assemble it. And we did! (about 98% of it, see problems in: [`mrjob_ass_safe.py` - Hadoop](#mrjobasssafepy---hadoop)) There was about 323 mutations, compared to the reference genome. Other then that, we don't really know much about what the DNA means, although that was not a part out our project goal.
+
+We did not verify our pipeline against a known reference and sample (although we should!), so you know, untill that time, don't trust the output with anything important.
 
