@@ -153,7 +153,7 @@ logging.disable(logging.CRITICAL)
 *Remember, you may not be calling any logging, but a library you have imported may!*
 
 
-When you are using spark, it is also important to note that the smallest unit spark will process in parallel is a partition. If you have 1000 cores, and 1 partition, only 1 core will be used. If you have fewer partitions that you have cores, or using operations that reduce the number of partitions, consider re-partitioning with [`.repartition(num_paritions)`](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.RDD.repartition.html)
+When you are using spark, it is also important to note that the smallest unit spark will process in parallel is a partition. If you have 1000 cores, and 1 partition, only 1 core will be used (assuming 1 core/partition). If you have fewer partitions that you have cores, or using operations that reduce the number of partitions, consider re-partitioning with [`.repartition(num_paritions)`](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.RDD.repartition.html)
 If you have your cluster running on all your datanodes, but only see a few cores being utilized and you correctly configured `spark.executor.instances` in your config, then too few partitions may be the issue.
 
 You can easily configure the number of executors, and their memory limit individually in your python scripts or notebooks, for example like this:
@@ -357,12 +357,19 @@ Takes the output of `write-assembled-nohbase.py` and makes it easier to consume.
 
  Example output: `[(100000, ('A', 1.0, 11, [('A', 11)]))]`
 
+### `assembly-inspection.ipynb` - Spark
 
+Simply a demo-file to show off some analysis on the assembled DNA.
+In the current configuration, it shows that most of the bases of the assembled DNA match the reference, and it also shows where mutations have taken place (bases actually changed in the sample DNA)
+
+You can play with this file yourself (we provide pre-buildt files), see [Results for `SRR15404285.sra` and `assembledASM694v2` (index)](#results-for-srr15404285sra-and-assembledasm694v2-index).
 
 ## Results for `SRR15404285.sra` and `assembledASM694v2` (index)
 You can find the result analysis in: `assembly-inspection.ipynb`.
 
 We intend for you to be able to play around with the results yourself, and perform a analysis without having a gigantic spark cluster. You may download the pre-computed results from the file in section [Pipeline](#pipeline). It should be runnable on a local spark installation.
+
+Our goal in itself was not to prove something about the DNA, just assemble it. And we did! (about 98% of it, see problems in: [`mrjob_ass_safe.py` - Hadoop](#mrjobasssafepy---hadoop)) 
 
 
 ## Cluster setup
