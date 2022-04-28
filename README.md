@@ -282,7 +282,7 @@ For our column families, we added a bloom filter for our rows and columns (for f
 ### `preprocess-reads.ipynb` - Spark
 For why we use Spark for preprocessing, see section: [Spark v. Hadoop](#spark-v-hadoop)
 
-A simple job, which does preprocessing on `hdfs:///files/salmonella/SRR15404285.fasta`, and produces `hdfs:///files/salmonella/SRR15404285.pickleb64.320`. It simply extracts every read as a string, along with the index of that read into the `SRR15404285.fasta` file, making each read unique (so we could tract matches to reads later, if needed). We call that index the "read index". The output is repartitioned (we had 320 partitions, hence `.320` in the filename. To see why 320, see section [`mrjob_ass_safe.py` - Hadoop](#mrjob_ass_safepy---hadoop)), pickled, base64 encoded, then saved as a text file (with each line being one read object).
+A simple job, which does preprocessing on `hdfs:///files/salmonella/SRR15404285.fasta`, and produces `hdfs:///files/salmonella/SRR15404285.pickleb64.320`. It simply extracts every read as a string, along with the index of that read into the `SRR15404285.fasta` file, making each read unique (so we could trace matches to reads later, if needed). We call that index the "read index". The output is repartitioned (we had 320 partitions, hence `.320` in the filename. To see why 320, see section [`mrjob_ass_safe.py` - Hadoop](#mrjob_ass_safepy---hadoop)), pickled, base64 encoded, then saved as a text file (with each line being one read object).
 
 Example input: `[(0, 'TGCCGNCCTGAGCGAAAGCCTGCTGGAAGAAGTAGCTTCGCTGGTGGAATGGCCGGTGGTATTGACGGCGAAATT')]`
 
