@@ -60,6 +60,8 @@ We felt limited by our 2GB, as we could not use VS Code for development (it ate 
 On the datanodes, we're stuck with a bit of a dilemma. If we run just hadoop/spark, it's fine. But with HBase, problems start appearing. If you do not configure a memory limit for HBase, nor Hadoop/Spark, you quickly run into issues running out of memory. If you configure HBase to use 50% of the RAM, and Hadoop/Spark the other 50%, you're missing out on performance for all the jobs not requiring HBase to be running.  Limiting the memory available to HBase may also impact write/read performance, although other than running out of memory, we did not profile this comparatively. You could shut down your HBase cluster between jobs when not in use, and individually limit hadoop/spark memory usage when hbase is running, but you lose your HBase cache. Had memory been doubled, to 16GB, it probably would have been fine with both (assuming you configure a max memory limit, otherwise they may fight each other), as the pressure from other services consuming memory would have lessened.
 That being said, 8GB was entierly doable, and we could use 8GB datanodes again.
 
+### Configuration
+
 You can find the configuration files we used for our Hadoop and HBase installations, under the `configs/` directory.
 
 You can find the Python packages installed in `requirements.txt` (namenode), and `requirements-datanode.txt` (datanode).
