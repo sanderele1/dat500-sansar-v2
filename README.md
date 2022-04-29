@@ -123,6 +123,9 @@ The execution time for the hadoop jobs varies quite a bit depending on the load 
 * `assembledASM694v2` - NCBI: https://www.ncbi.nlm.nih.gov/assembly/GCF_000006945.2/
 * `SRR15404285.sra` - NCBI: https://www.ncbi.nlm.nih.gov/sra/SRR15404285
 
+
+![File overview](architecture.png)
+
 ## Building the fuzzy index
 1. [`sliding-window.ipynb` - Spark](#sliding-windowipynb---spark)
     * Inputs: `hdfs:///files/salmonella/assembledASM694v2`
