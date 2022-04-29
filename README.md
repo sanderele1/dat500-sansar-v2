@@ -117,6 +117,8 @@ These are also the cleaned up brethren of the actual files used to run the job f
 For your convenience, we have gathered all of the input and output files in a pre-assembled approx. 3GB `.tar.gz` file available [here (azure blob storage)](https://distributed.blob.core.windows.net/public/DAT500_blobs.tar.gz?sv=2020-10-02&st=2022-04-26T16%3A14%3A29Z&se=2023-04-27T16%3A14%3A00Z&sr=b&sp=r&sig=nBsI%2Bhw%2BrIchhbMlcjtE1Rdvp6OjqumhsIe0otQk6j8%3D) (available untill 2023, or whenever the project is no longer relevant. whichever is shorter).
 There is also a UiS only backup link (onedrive) [here](https://liveuis-my.sharepoint.com/:u:/g/personal/264854_uis_no/EUgLKoiOrpJCsNOZ10sjKkkBW-xhTSgx5lJQ53gP5-eL8g?e=BPvVgn).
 
+The execution time for the hadoop jobs varies quite a bit depending on the load on the system, but are in the ballpark of 2-5 hours in total (all of them).
+
 ## Sources
 * `assembledASM694v2` - NCBI: https://www.ncbi.nlm.nih.gov/assembly/GCF_000006945.2/
 * `SRR15404285.sra` - NCBI: https://www.ncbi.nlm.nih.gov/sra/SRR15404285
