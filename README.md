@@ -62,6 +62,8 @@ That being said, 8GB was entierly doable, and we could use 8GB datanodes again.
 
 You can find the configuration files we used for our Hadoop and HBase installations, under the `configs/` directory.
 
+You can find the Python packages installed in `requirements.txt` (namenode), and `requirements-datanode.txt` (datanode).
+
 
 [^1]: [`GenASM paper, Introduction,  page 1 - https://doi.org/10.48550/arXiv.2009.07692`](https://doi.org/10.48550/arXiv.2009.07692)
 
@@ -121,9 +123,11 @@ There is also a UiS only backup link (onedrive) [here](https://liveuis-my.sharep
 1. [`sliding-window.ipynb` - Spark](#sliding-windowipynb---spark)
     * Inputs: `hdfs:///files/salmonella/assembledASM694v2`
     * Outputs: `hdfs:///files/salmonella/window`
+    * Execution time: about 2 minutes
 2. [`convert-spark-hadoop-window.ipynb` - Spark](#convert-spark-hadoop-windowipynb---spark)
     * Inputs: `hdfs:///files/salmonella/window`
     * Outputs: `hdfs:///files/salmonella/window.b64pickled`
+    * Execution time: about 1 minute
 3. [`hbase_insert.py` - Hadoop](#hbase_insertpy---hadoop)
     * Inputs: `hdfs:///files/salmonella/window.b64pickled`
     * Outputs: `<multiple hbase tables>: 'hbase_salmonella_pos_prefix_8`
@@ -139,6 +143,7 @@ There is also a UiS only backup link (onedrive) [here](https://liveuis-my.sharep
 3. [`preprocess-reads.ipynb` - Spark](#preprocess-readsipynb---spark)
     * Inputs: `hdfs:///files/salmonella/SRR15404285.fasta`
     * Outputs: `hdfs:///files/salmonella/SRR15404285.pickleb64.320`
+    * Execution time: about 2.5 minutes
 4. [`mrjob_ass_safe.py` - Hadoop](#mrjobasssafepy---hadoop)
     * Inputs: `<multiple hbase tables>: 'hbase_salmonella_pos_prefix_8`
     * Inputs: `hdfs:///files/salmonella/SRR15404285.pickleb64.320`
@@ -151,11 +156,13 @@ There is also a UiS only backup link (onedrive) [here](https://liveuis-my.sharep
 6. [`re-assemble-grouped-positions.ipynb` - Spark](#re-assemble-grouped-positionsipynb---spark)
     * Inputs: `hdfs:///files/salmonella/grouped_positions`
     * Outputs: `hdfs:///files/salmonella/assembly_reconstructed`
+    * Execution time: about 1.5 minutes
 ### Analysis
 1. [`assembly-inspection.ipynb` - Spark](#assembly-inspectionipynb---spark)
     * Inputs: `hdfs:///files/salmonella/assembly_reconstructed`
     * Inputs: `hdfs:///files/salmonella/assembledASM694v2`
     * Outputs: `<human interaction/none>`
+    * Execution time: about 2 minutes
     
 ### Spark v. Hadoop
 
