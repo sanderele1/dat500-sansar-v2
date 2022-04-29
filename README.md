@@ -124,6 +124,8 @@ The execution time for the hadoop jobs varies quite a bit depending on the load 
 * `SRR15404285.sra` - NCBI: https://www.ncbi.nlm.nih.gov/sra/SRR15404285
 
 
+## File overview
+
 ![File overview](architecture.png)
 
 ## Building the fuzzy index
